@@ -74,15 +74,11 @@ impl TokenInfo {
             return; 
         }
 
-        let op: Option<Expiration> = env.storage().persistent().get(&DataKey::Operator(self.owner.clone(), from)).unwrap();
-        match op {
-            Some(ex) => {
-                if ex.is_expired(&env) {
-                    panic_with_error!(&env, Error::NotAuthorized)
-                }
-            }
-            None => panic_with_error!(&env, Error::NotAuthorized),
+        if env.storage().temporary().has(&DataKey::Operator(self.owner.clone(), from)) {
+            return;
         }
+
+        panic_with_error!(&env, Error::NotAuthorized);
     }
 }
 
